@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from 'lucide-react';
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 interface WordResult {
     word: string;
@@ -35,13 +35,17 @@ const Search = () => {
             setResult(null);
             setError('Word not found');
         }
-    } catch (err: any) {
-        if (err.response?.status === 404) {
-            setError('Word not found');
-        } else {
-            setError('An error occurred while searching');
-        }
-        setResult(null);
+    } catch (err) {
+        if (err instanceof AxiosError) {
+            if (err.response?.status === 404) {
+              setError('Word not found');
+            } else {
+              setError('An error occurred while searching');
+            }
+          } else {
+            setError('An unexpected error occurred');
+          }
+          setResult(null);
     } finally {
         setLoading(false);
     }
