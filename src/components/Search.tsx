@@ -30,7 +30,7 @@ const Search = () => {
       const { word, definition, partOfSpeech } = response.data;
 
       if (word) {
-        setResult({ word, definition, partOfSpeech }); // partOfSpeech is camelCase
+        setResult({ word, definition, partOfSpeech });
       } else {
         setResult(null);
         setError('Word not found');
