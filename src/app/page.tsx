@@ -1,6 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import AddEntry from "@/components/AddEntry";
 import Search from "@/components/Search";
+import AboutMe from "@/components/AboutMe";
 
 export default function Home() {
   return (
@@ -11,13 +11,13 @@ export default function Home() {
         <Tabs defaultValue="search" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="search">Search</TabsTrigger>
-            <TabsTrigger value="add">Add Entry</TabsTrigger>
+            <TabsTrigger value="about">About Me</TabsTrigger>
           </TabsList>
           <TabsContent value="search">
             <Search />
           </TabsContent>
-          <TabsContent value="add">
-            <AddEntry />
+          <TabsContent value="about">
+            <AboutMe />
           </TabsContent>
         </Tabs>
       </div>
