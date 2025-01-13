@@ -14,11 +14,10 @@ datasource db {
 }
 
 model Entry {
-  id           Int    @id @default(autoincrement())  // Primary Key, Auto-increment
-  word         String @unique                        // Unique word entry
-  definition   String                               // Definition of the word
-  partOfSpeech String                               // Part of speech for the word
-
-  createdAt    DateTime @default(now())             // Created timestamp
-  updatedAt    DateTime @updatedAt                  // Updated timestamp (auto-updated)
+  id                   Int      @id @default(autoincrement())
+  word                 String   @unique
+  definition           String
+  partOfSpeech         String
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 }

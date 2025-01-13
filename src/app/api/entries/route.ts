@@ -16,31 +16,30 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const word = searchParams.get('word')?.toLowerCase(); // Normalize the word to lowercase
 
-if (!word) {
-  return NextResponse.json({ error: 'Word query parameter is required' }, { status: 400 });
-}
-
-try {
-  // Track word usage in Redis
-  const usageKey = `word_usage:${word}`; // Use normalized word for the key
-  const usageCount = await redis.incr(usageKey);
-
-  // Define cache expiry based on usage frequency
-  let cacheExpiry = 86400; // Default to 1 day (86400 seconds)
-  if (usageCount > 10) {
-    cacheExpiry = 2592000; // Set cache expiry to 30 days (2592000 seconds) for high-traffic words
-  } else if (usageCount > 5) {
-    cacheExpiry = 604800; // Set cache expiry to 7 days (604800 seconds) for medium-traffic words
+  if (!word) {
+    return NextResponse.json({ error: 'Word query parameter is required' }, { status: 400 });
   }
 
-  // Check if the word exists in Redis cache
-  const cachedResult = await redis.get(word); // Use normalized word for Redis operations
-  if (cachedResult) {
-    console.log('Returning from Redis cache:', cachedResult);
-    const parsedResult = JSON.parse(cachedResult);
-    return NextResponse.json(parsedResult);
-  }
+  try {
+    // Track word usage in Redis
+    const usageKey = `word_usage:${word}`; // Use normalized word for the key
+    const usageCount = await redis.incr(usageKey);
 
+    // Define cache expiry based on usage frequency
+    let cacheExpiry = 86400; // Default to 1 day (86400 seconds)
+    if (usageCount > 10) {
+      cacheExpiry = 2592000; // Set cache expiry to 30 days (2592000 seconds) for high-traffic words
+    } else if (usageCount > 5) {
+      cacheExpiry = 604800; // Set cache expiry to 7 days (604800 seconds) for medium-traffic words
+    }
+
+    // Check if the word exists in Redis cache
+    const cachedResult = await redis.get(word); // Use normalized word for Redis operations
+    if (cachedResult) {
+      console.log('Returning from Redis cache:', cachedResult);
+      const parsedResult = JSON.parse(cachedResult);
+      return NextResponse.json(parsedResult);
+    }
 
     // Otherwise, check if the word exists in the PostgreSQL database using Prisma
     const result = await prisma.entry.findUnique({

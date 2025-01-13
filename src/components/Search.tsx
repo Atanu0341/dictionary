@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect } from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError } from 'axios';
 
 interface WordResult {
   word: string;
@@ -15,17 +15,27 @@ interface WordResult {
 
 const Search = () => {
   const [query, setQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState(query);
   const [result, setResult] = useState<WordResult | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState('');
 
+  // Debounce the search input
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setDebouncedQuery(query);
+    }, 500); // Adjust delay as necessary
+
+    return () => clearTimeout(timeoutId); // Cleanup timeout on component unmount
+  }, [query]);
+
   const handleSearch = async () => {
-    if (!query.trim()) return;
+    if (!debouncedQuery.trim()) return;
 
     try {
       setLoading(true);
       setError('');
-      const response = await axios.get(`/api/entries?word=${query}`);
+      const response = await axios.get(`/api/entries?word=${debouncedQuery}`);
       
       const { word, definition, partOfSpeech } = response.data;
 
@@ -67,6 +77,9 @@ const Search = () => {
           />
           <Button onClick={handleSearch} disabled={loading}>
             {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Search'}
+          </Button>
+          <Button onClick={() => { setQuery(''); setResult(null); setError(''); }} disabled={loading}>
+            Clear
           </Button>
         </div>
 
